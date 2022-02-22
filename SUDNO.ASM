@@ -141,14 +141,8 @@ molchatdoma:
 
 	mov al, 00h
 	inc dh
-;	mov cx, 3
-;	call drawv
-
-	call draw
-	inc dh
-	call draw
-	inc dh
-	call draw
+	mov cx, 3
+	call drawv
 	
 	; 2 ------------
 
