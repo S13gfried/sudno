@@ -4,10 +4,7 @@ title drisnya.asm
 
 .data
 
-debugMessage db "cum $"
-
 initRow db 00h
-initColumn db 00h
 extraCounter dw 00h
 
 .code
