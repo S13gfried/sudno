@@ -112,10 +112,12 @@ drawv:	mov extraCounter, cx
 	drawvExit: ret
 
 ; MOLCHATDOMA
-; mlrvn sudn okshk tumbchk krv
+; renders BUERAKUS in a specified location.
 ;
 ; DH - top left line
 ; DL - top left column
+;
+; DESTROYS EVERYTHING ELSE
 
 molchatdoma:
 	mov initRow, dh
