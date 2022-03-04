@@ -4,7 +4,8 @@ title drisnya.asm
 
 .data
 
-debugMessage db "Awaiting input: "
+debugMessage	db "Awaiting input: $"
+sample		db "13 $"
 
 initRow		db 00h
 initColumn	db 00h							
@@ -28,33 +29,29 @@ digitCodes	db '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
 Start:	mov ax, @data	 ;Moving the address of data segment to ax
 	mov ds, ax   	 ;here it goes for real
 
-	mov bh, 0Eh
+	mov bh, 4Ch
 	call clear
 
-	mov dh, 10
-	mov dl, 20
-
 	lea bx, debugMessage
+	call print
+
+	lea bx, sample
 	call measure		;calculating length of debugMessage
 
-	lea ax, debugMessage
-	lea cx, outputBuffer
-	call load		;loading debugMessage for output
+	lea ax, sample
+	lea cx, inbuffer
+	call load		
 
-	call write		;printing out loaded buffer
-
-	call read		;checking for input
+	call getint
 	call line
+	
+	mov cx, dx
+	mov al, 0bh
+	mov bl, 96h
+	mov dh, 36
+	mov dl, 12
 
-	lea bx, inbuffer
-	call measure		;calculating length of input
-
-	lea ax, inbuffer	
-	lea cx, outputBuffer
-	call load		;loading input for output
-
-	call write		;printing out loaded buffer
-	call line
+	call drawh
 
 	call exit
 
@@ -95,6 +92,29 @@ write:	push ax
 	pop dx
 	pop ax
 	ret
+
+; PRINT
+;
+;
+
+print:	push ax
+	push cx
+	push dx
+
+	call measure
+
+	mov ax, bx
+	lea cx, outputBuffer
+	call load
+	
+	call write
+
+	pop dx
+	pop cx
+	pop ax
+
+	ret
+	
 
 ; LINE
 ;
@@ -160,7 +180,60 @@ measure:
 	measureRdy:	pop cx
 			inc dl
 			ret
+
+; GETINT
+;
+; scans for int in input buffer. moves it to DX
+
+getint:	push ax
+	push bx
+	push cx
+
+	lea bx, inbuffer
+	mov dx, 0
+
+	nextDigit:	mov cl, 0
+			mov ch, [bx]
+
+			push bx
+			lea bx, digitCodes
+
+			checkForDigit:	cmp ch, [bx]
+					je isDigit
+
+					cmp cl, 9
+					je intRdy
+					
+					inc ax
+					inc cl
+					
+					jmp checkForDigit
+	isDigit:	push ax
 			
+			mov bx, 10
+			mul bx
+
+			pop ax
+			pop bx
+
+			mov ch, 0
+			add dx, cx
+
+			inc bx
+			jmp nextDigit	
+	
+	intRdy:	pop cx
+		pop bx
+		pop ax
+
+		ret
+
+; INTSTR
+;
+; converts an int to string
+
+
+						
 ; CLEAR
 ; clears the screen.
 ;
